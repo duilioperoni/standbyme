@@ -1,0 +1,130 @@
+Application Program Interface (API)
+API are PHP script executed by the Apache server on an URL request from client.
+URL is defined as a web address identified by an host name follwed by a page name and may have parametric values sent as couple name/value after question mark symbol sepatated by ampersand symbol.
+http://<hostname>/folder/apiname.php?param1=value1&param2=value2
+
+Available API are:
+
+simupdstatus
+Update a device status request: applies to a single device and updates related status info; returns the  global status of the device.
+Request: http://<hostname>/standbymesim/simupdstatus.php?thing=btmac&status=value
+thing: btmac of device a 12 character unique string for each device
+status: value of status 0=OK, 1=ALERT
+Response: see single device response
+
+simupdproxy
+Create a new record in proxy table related to a start of alert or end of alert between two device; returns the added record info.
+Request: http://<hostname>/accessosim/simupdproxyt.php?mything=btmacid&otherthing=btmac&status=value
+mything: btmac of device that found alert a 12 character unique string for each device
+otherthing: btmac of device that founded in proximity a 12 character unique string for each device
+status: value of status 0=end alert, 1=start alert
+Response: see single proxy response
+
+simresetproxy
+Request of global reset of database: all devices are set to ok status and all proxy records are deleted.
+Request: http://<hostname>/standbymesim/simgetall.php
+No parameters
+Response: {"response":"ok"}
+
+simgetall
+Request of global status of all restrooms; applies to all thing and do not modify anything; returns the  global status of all the things.
+Request: http://<hostname>/standbymesim/simgetall.php
+No parameters
+Response: see all  devices response
+
+simsseproxy
+Request an SSE type response containing all proxy records in reverse order
+Request: http://<hostname>/standbymesim/simsseproxy.php
+No parameters
+Response: see all  proxies response
+
+simgetbacktrace
+Request of all proxy alerts of a device; 
+Request: http://<hostname>/standbymesim/simugetbacktrace.php?thing=btmac
+thing: btmac of device a 12 character unique string for each device
+Response: see single backtrace response
+
+
+
+
+Single device response
+{
+"response":"ok | ko",
+"data":{"id":"id_code",
+	  "btmac":"btmac",
+	  "wifimac":"wifimac",
+         "status":"0| 1",
+         "timestamp":"##########"}
+}
+
+All devices response
+{
+ "response":"ok | ko",
+ "data":[
+	 {"id":"id_code_1",
+	  "btmac":"btmac",
+	  "wifimac":"wifimac",
+        "status":"0| 1",
+                "timestamp":"##########"},
+		 ...
+	 {"id":"id_code_n",
+	  "btmac":"btmac",
+	  "wifimac":"wifimac",
+        "status":"0| 1",
+                "timestamp":"##########"}
+	]
+	| "failure_desc"
+}
+
+Single proxy response
+{"response":"ok | ok",
+"data": {"mybtmac":"btmac",
+              "otherbtmac":"btmac",
+              "status":"0 | 1",
+              "timestamp":##########,
+               "duration": ##########
+            }
+}
+
+All proxy response
+data: {"numrow":"###",
+           "events":[
+                           {"mybtmac":"btmac",
+                             "otherbtmac":"btmac",
+                             "timestamp":"##########,
+                             "status":"0|1"},
+                             ...
+                           {"mybtmac":"btmac",
+                             "otherbtmac":"btmac",
+                             "timestamp":"##########,
+                             "status":"0|1"}
+
+                          ]
+}
+
+Single backtrace response
+{"response":"ok | ko",
+  "data":[{"myid":id,
+                "mymac":"btmac",
+                "othid":id,
+                "othmac":"btmac",
+                "st":0|1,
+                "ts":##########,
+                "dur":##########},
+                ...
+	   {"myid":id,
+                "mymac":"btmac",
+                "othid":id,
+                "othmac":"btmac",
+                "st":0|1,
+                "ts":##########,
+                "dur":##########}
+              ]
+}
+
+Legend:
+id: unique number identifing a device
+btmac: unique numeric string identifing bt address of a device
+wifimac: unique numeric string identifing wifi address of a device
+timestamp: unix time of the event
+duration: time between start and end event in seconds
