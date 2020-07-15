@@ -1,0 +1,42 @@
+Application setup
+This simulation is a web application based on xAMP platform.
+For a local test you need to install a xAMP platform on your computer.
+xAMP is an acronym for x=any OS, A=Apache web server, M=MySql database manager, P=PHP scripting language.
+
+Installation of LAMP on Linux Debian and derivatives
+sudo apt-get update
+sudo apt-get -y install apache2
+sudo systemctl start apache2.service
+sudo apt-get install mysql-server (during setup create a root pwd)
+sudo apt-get -y install php php-mysql
+sudo systemctl restart apache2.service
+sudo apt install phpmyadmin (require mysql root pwd)
+
+Installation of WAMP on Windows
+WAMP platform is not integrated in Windows OS.
+You need to install third party application like xAMPP.
+Launch xampp-control application and start Apache and MySQL servers
+
+Copy Application folder "standbysim" into Apache data directory
+Linux OS:	usually / var / www / 
+Windows OS:  <xAMPP installation path>\htdocs
+Launch the mysqladim control panel (http://localhost/phpmyadmin
+Create a new empty database named standbyme
+Assign the new database to the user standbymeuser with password qwerty in the SQL tab
+(GRANT ALL PRIVILEGES ON standbyme.* TO standbymeuser@localhost IDENTIFIED BY qwerty)
+Import the standbyme.sql database contained in the repository root into the Import tab of the new database.
+
+Visit address: http://localhost/standbymesim
+This is home page of simulation. Home page contains:
+- A block diagram of system
+- link to real time time proximity sensor  sensor simulator page
+- link to message broker simulator page
+- link to dashboard simulator page
+Each link opens on a different page so you can operate on each page independently and see effect on the other pages.
+
+For example some typical action are:
+
+On real time proximity sensor simulator: move a student in the grid using the four direction arrows. When distance between two student is less than two cells both student became red on simulator and status and proxy are updated in database. 
+On message broker simulator: proximity sensor table shows in real time the status of each proximity sensor with the time of the last change. Proxy events table shows the history of changes of all sensor in reverse order (more recent first). You can simulate a proxy event.
+On dashbord simulator: shows, in real time, the status of all devices and allow the backtracking of a single device finding alerts with other device in a range of time.
+
