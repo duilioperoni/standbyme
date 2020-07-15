@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Simulator</title>
+<script type='text/javascript' src='../js/jquery/jquery.js?ver=1.12.4-wp'></script>
+<script type='text/javascript' src='../js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<link href="../css/site.css" rel="stylesheet">
+<link href="../css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+<div id="main">
+<h1 class="intest">Dashboard Simulator</h1>
+<hr id="hd1">
+<div style="float:left; width:40%; padding:10px">
+<h4>Proximity Devices</h4>
+<h4>STUDENT #1 (240ac4623d6a) STATUS<span class="unk" id="rrsta1">UNKNOWN</span></h4>
+<h4>STUDENT #2 (240ac462411a) STATUS<span class="unk" id="rrsta2">UNKNOWN</span></h4>
+<h4>STUDENT #3 (fcf5c42e1cca)&nbsp;&nbsp;&nbsp; STATUS<span class="unk" id="rrsta3">UNKNOWN</span></h4>
+<h4>STUDENT #4 (fcf5c42f303e)&nbsp;&nbsp;&nbsp; STATUS<span class="unk" id="rrsta4">UNKNOWN</span></h4>
+</div>
+<div id="proxy2" >
+<h4>Alert Backtracing</h4>
+<b>STUDENT&nbsp;#&nbsp;<select name="myth" id="myth">
+<option value="240ac4623d6a">1(240ac4623d6a)</option>
+<option value="240ac462411a">2(240ac462411a)</option>
+<option value="fcf5c42e1cca">3(fcf5c42e1cca)</option>
+<option value="fcf5c42f303e">4(fcf5c42f303e)</option>
+</select>&nbsp;START&nbsp;DATE&nbsp;<input size="10" type="date" name="strdt" id="strdt">&nbsp;END&nbsp;DATE&nbsp;<input size="10" type="date" name="enddt" id="enddt">&nbsp;<input type="button" value="Backtrace" onClick="backtrace()"></b>
+<div id="alert">
+</div>
+</div>
+<div style="clear:left"></div>
+<div style="float:clear">
+<hr >
+<h5 ><i>REQUEST:</i><span id="rq">?</span></h5>
+<h5><i>RESPONSE:</i><span id="rs">?</span></h5>
+<hr>
+<div id="contenitore"><p class="doc">This web page simulates Standbyme Dashboard.<br>
+It shows the status of the of bt devices (ok or alert) and allow extraction of backtracing info related to a single device<br>
+These info are view only.</p></div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+//main
+//set up timers
+var interval = setInterval(getall, 500);
+//functions
+//periodically update info of eache restroom
+function getall() {
+	//build request URL
+	var req="../api/simgetall.php";
+	//local diagnostic of request URL
+	//jQuery('#rq').html(req);
+	//update local diagnostic of status
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+					//remote diagnostic of response
+					//jQuery('#rs').html(data);
+					var things = jQuery.parseJSON( data ).data;
+					var i=1;
+					things.forEach(function(t){
+						var sta=t.status;
+						if(sta==0){
+							msg="OK"
+							jQuery('#rrsta'+i).removeClass().addClass('vac');
+							
+						}
+						else if (sta==1){
+							msg="ALERT"
+							jQuery('#rrsta'+i).removeClass().addClass('eng');
+						}
+						jQuery('#rrsta'+i).html(msg);
+						i++;
+					});
+				},
+        error: function(){
+					//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+
+function backtrace() {
+	//build request URL
+	var mything=jQuery('#myth option:selected').val();
+	var strtime=jQuery('#strdt').val();
+	strtime=new Date(strtime).getTime()/1000;
+	if(isNaN(strtime)) strtime=0;
+	var endtime=jQuery('#enddt').val();
+	endtime=new Date(endtime).getTime()/1000;
+	if(isNaN(endtime)) endtime=9999999999;
+	var req="../api/simgetbacktrace.php?thing="+mything+"&strtime="+strtime+"&endtime="+endtime;
+	//local diagnostic of request URL
+	jQuery('#rq').html(req);
+	//update local diagnostic of status
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+						//remote diagnostic of response
+						jQuery('#rs').html(data);
+						var things = jQuery.parseJSON( data ).data;
+						var ptab='<table class="table-bordered" width="100%"><tr><td class="legenda" width="5%">ID</td><td class="legenda" width="25%">MAC</td><td class="legenda" width="20%">STATUS</td><td class="legenda" width="25%">TIMESTAMP</td><td class="legenda" width="25%">DURATION</td></tr>';
+						if (typeof things === "undefined") {
+							ptab+='</table>';
+						}
+						else {
+							things.forEach(function(t){
+							    //compute event date
+								var adt = new Date(t.ts * 1000);
+								var astr=(adt.getDate())+"/"+(adt.getMonth()+1)+"/"+adt.getFullYear()+" "+adt.getHours()+":"+adt.getMinutes()+":"+adt.getSeconds();
+								var st=t.st;
+								var sstr;
+								//computer event duration
+								var s=t.dur;
+								var h=Math.floor(s/3600);
+								var m=Math.floor((s%3600)/60);
+								var s=(s%3600)%60;
+								var sdur=h+":"+m+":"+s;
+								if (st==0) sstr="END&nbsp;ALERT";
+								else       sstr="START&nbsp;ALERT";
+								ptab+='<tr><td class="dato">'+t.othid+'</td><td class="dato">'+t.othmac+'</td><td class="dato">'+sstr+'</td><td class="dato">'+astr+'</td><td class="dato">'+sdur+'</td></tr>';						
+							});
+							ptab+='</table>';
+						}
+						jQuery('#alert').html(ptab);
+		},
+        error: function(){
+					//error trap
+                    jQuery("#contenitore").html("AJAX error");
+        },	
+	});
+
+}
+</script>
