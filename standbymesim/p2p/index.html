@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real Time Proximity Sensor Simulator</title>
+<script type='text/javascript' src='../js/jquery/jquery.js?ver=1.12.4-wp'></script>
+<script type='text/javascript' src='../js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<link href="../css/site.css" rel="stylesheet">
+<link href="../css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+<div id="main">
+<h1 class="intest">Real&nbsp;Time&nbsp;Proximity&nbsp;Sensor&nbsp;Simulator</h1>
+<hr id="hd1">
+<div id="p00" class="cell">
+<div title="student #1" class="stud" id="s0">
+<button class="btnnup" onclick="moveButton(jQuery('#s0'),'U')" type="button" ><img src="../images/up.png"></button>
+<button class="btnleft" onclick="moveButton(jQuery('#s0'),'L')" type="button"><img src="../images/left.png"></button>
+<img id="i0" src="../images/s0ok.png" >
+<button class="btnright" onclick="moveButton(jQuery('#s0'),'R')" type="button"><img src="../images/right.png"></button>
+<button class="btndown" onclick="moveButton(jQuery('#s0'),'D')" type="button"><img src="../images/down.png"></button>
+</div>
+</div>
+<div id="p01" class="cell"></div>
+<div id="p02" class="cell"></div>
+<div id="p03" class="cell"></div>
+<div id="p04" class="cell">
+<div title="student #2" class="stud" id="s1">
+<button class="btnnup" onclick="moveButton(jQuery('#s1'),'U')" type="button"><img src="../images/up.png" ></button>
+<button class="btnleft" onclick="moveButton(jQuery('#s1'),'L')" type="button"><img src="../images/left.png" ></button>
+<img id="i1" src="../images/s1ok.png" >
+<button class="btnright" onclick="moveButton(jQuery('#s1'),'R')" type="button"><img src="../images/right.png" ></button>
+<button class="btndown" onclick="moveButton(jQuery('#s1'),'D')" type="button"><img src="../images/down.png" ></button>
+</div>
+</div>
+<div id="p10" class="cell"></div>
+<div id="p11" class="cell"></div>
+<div id="p12" class="cell"></div>
+<div id="p13" class="cell"></div>
+<div id="p14" class="cell"></div>
+<div id="p20" class="cell"></div>
+<div id="p21" class="cell"></div>
+<div id="p22" class="cell"></div>
+<div id="p23" class="cell"></div>
+<div id="p24" class="cell"></div>
+<div id="p30" class="cell"></div>
+<div id="p31" class="cell"></div>
+<div id="p32" class="cell"></div>
+<div id="p33" class="cell"></div>
+<div id="p34" class="cell"></div>
+<div id="p40" class="cell">
+<div title="student #3" class="stud" id="s2">
+<button class="btnnup" onclick="moveButton(jQuery('#s2'),'U')" type="button"><img src="../images/up.png" ></button>
+<button class="btnleft" onclick="moveButton(jQuery('#s2'),'L')" type="button"><img src="../images/left.png" ></button>
+<img id="i2" src="../images/s2ok.png" >
+<button class="btnright" onclick="moveButton(jQuery('#s2'),'R')" type="button"><img src="../images/right.png" ></button>
+<button class="btndown" onclick="moveButton(jQuery('#s2'),'D')" type="button"><img src="../images/down.png" ></button>
+</div>
+</div>
+<div id="p41" class="cell"></div>
+<div id="p42" class="cell"></div>
+<div id="p43" class="cell"></div>
+<div id="p44" class="cell">
+<div  title="student #4" class="stud" id="s3">
+<button class="btnnup" onclick="moveButton(jQuery('#s3'),'U')" type="button"><img src="../images/up.png" ></button>
+<button class="btnleft" onclick="moveButton(jQuery('#s3'),'L')" type="button"><img src="../images/left.png" ></button>
+<img id="i3" src="../images/s3ok.png" >
+<button class="btnright" onclick="moveButton(jQuery('#s3'),'R')" type="button"><img src="../images/right.png" ></button>
+<button class="btndown" onclick="moveButton(jQuery('#s3'),'D')" type="button"><img src="../images/down.png" ></button>
+</div>
+</div>
+<div id="foot">
+<hr id="ft1">
+<h5 id="ft2"><i>REQUEST:</i><span id="rqmsg">?</span></h5>
+<h5 id="ft3"><i>RESPONSE:</i><span id="rsmsg">?</span></h5>
+<hr id="ft4">
+<div id="contenitore">
+<p class="doc">This web page simulates four student with proximity sensor moving in a classroom<br>
+Moving the students inside a square space composed of 24 cell you can simulate alarm of proximity between two or more student.<br>
+The simulator sends switch to red alarmed sensor and send a request of backtracking to the message broker for each alarm and the message broker's response<br>
+<b>CAUTION</b>: Student position is only for simulation purpose; the system can't detect real student position but only reciprocal proximity.<br>Reload or forced refresh (F5) of this page restore database to default (all device in safe state and empty backtrack</p></div>
+</div>
+</div>
+<div>
+</body>
+</html>
+<script type="text/javascript">
+var newsta=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+var oldsta=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+var btmac=['240ac4623d6a','240ac462411a','fcf5c42e1cca','fcf5c42f303e'];
+updsta();
+reset();
+//function moveButton: move element in one direction 
+function moveButton(elem,dir){
+	//get position of element: get parent id and parent position
+	var id=elem.parent().attr('id');
+	var r=id.charAt(1);
+	var c=id.charAt(2);
+	//move student: change row or col (if not at border), detach elem from current positon and append to new
+	if(dir=='U'){ //move up
+		if(r!='0'){
+			r=+r-1;
+			jQuery(elem).detach().appendTo('#p'+r+c);		
+		}
+	}
+	else if(dir=='L'){ //move left
+		if(c!='0'){
+			c=+c-1;
+			jQuery(elem).detach().appendTo('#p'+r+c);
+		}	
+	}
+	else if(dir=='R'){ //move right
+		if(c!='4'){
+			c=+c+1;
+			jQuery(elem).detach().appendTo('#p'+r+c);
+		}	
+	}
+	else { //'D'
+		if(r!='4'){	//move down
+			r=+r+1;
+			jQuery(elem).detach().appendTo('#p'+r+c);		
+		}
+	}
+	updsta();
+}
+//update device status after movements
+function updsta(){
+	//loop on each student
+    for(i=0;i<4;i++){
+		//get cur st position
+		var csp=jQuery('#s'+i).parent().attr('id');
+		var csr=csp.charAt(1);
+		var csc=csp.charAt(2);
+		//for each student loop on each other student
+		for(j=0;j<4;j++){
+			if(i!=j) { //bypass self test
+				//get other position
+				var osp=jQuery('#s'+j).parent().attr('id');
+				var osr=osp.charAt(1);
+				var osc=osp.charAt(2);
+				//alert("cur:"+csr+" "+csc+" oth:"+osr+" "+osc);
+				//test proximity of curr with other
+				var dx=Math.abs(+csr-osr);
+				var dy=Math.abs(+csc-osc);
+				if((dx<2)&&(dy<2)) { //proximity alarm
+					newsta[i][j]=1;
+				}
+				else {
+					newsta[i][j]=0;				
+				}
+				var nwst=newsta[i][j];
+				var olst=oldsta[i][j];
+				if(nwst!=olst) { //proxy variation
+					if(nwst==1){ //start alarm
+						sendproxy(btmac[i],btmac[j],1);				
+					}
+					else {	//end alarm
+						sendproxy(btmac[i],btmac[j],0);									
+					}
+				}
+		    }	
+		}
+	}
+	//update status and color
+	for(i=0;i<4;i++){
+		var alm=0;
+		for(j=0;j<4;j++){
+			alm=alm | newsta[i][j];			
+		}
+		if(alm==0) { //no alarm
+			sendsta(btmac[i],0);
+			jQuery('#i'+i).attr('src','../images/s'+i+'ok.png');
+		}
+		else {		//alarm
+			sendsta(btmac[i],1);
+			jQuery('#i'+i).attr('src','../images/s'+i+'ko.png');
+		}
+	}		
+	//update old
+	for(i=0;i<4;i++){
+		for(j=0;j<4;j++){
+			oldsta[i][j]=newsta[i][j];			
+		}
+	}	
+}
+//send a start/end alarm between two devices
+function sendproxy(my,other,status){
+		//build request URL
+		var req="../api/simupdproxy.php?mything="+my+"&otherthing="+other+"&status="+status;
+		//local diagnostic of request URL
+		jQuery('#rqmsg').html(req);
+		//update local diagnostic of status
+		//send request and wait for response (sycronous)
+		jQuery.ajax({
+			url: req,
+			dataType: 'html',
+			success: function (data) {
+						//remote diagnostic of response
+						jQuery('#rsmsg').html(data);
+                },
+                error: function(){
+						//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+//send a status of a device
+function sendsta(thing,status){
+		//build request URL
+		var req="../api/simupdstatus.php?thing="+thing+"&status="+status;
+		//local diagnostic of request URL
+		jQuery('#rqmsg').html(req);
+		//update local diagnostic of status
+		//send request and wait for response (sycronous)
+		jQuery.ajax({
+			url: req,
+			dataType: 'html',
+			success: function (data) {
+						//remote diagnostic of response
+						jQuery('#rsmsg').html(data);
+                },
+                error: function(){
+						//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+//reset all alarm status and remove backtrack
+function reset(){
+		//build request URL
+		var req="../api/simresetproxy.php";
+		jQuery('#rqmsg').html(req);
+		//send request and wait for response (sycronous)
+		jQuery.ajax({
+			url: req,
+			dataType: 'html',
+			success: function (data) {
+						//remote diagnostic of response
+						jQuery('#rsmsg').html(data);
+                },
+                error: function(){
+						//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+
+</script>
